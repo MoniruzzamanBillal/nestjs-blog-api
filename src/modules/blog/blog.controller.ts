@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpStatus, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Param, Post } from '@nestjs/common';
 import { BlogService } from './blog.service';
 import { CreateBlogDto } from './dto/create-blog.dto';
 
@@ -6,21 +6,36 @@ import { CreateBlogDto } from './dto/create-blog.dto';
 export class BlogController {
   constructor(private readonly blogServices: BlogService) {}
 
-  @Get('')
-  allBlogs() {
-    return {
-      message: 'All blogs retrived successfully !!!',
-    };
-  }
-
   @Post('/add-blog')
   async addNewBlog(@Body() addBlogDto: CreateBlogDto) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const result = await this.blogServices.addNewBlog(addBlogDto);
 
     return {
       success: true,
       statusCode: HttpStatus.CREATED,
+      data: result,
+    };
+  }
+
+  @Get('/all-blogs')
+  async allBlogs() {
+    const result = await this.blogServices.getAllBlogs();
+
+    return {
+      success: true,
+      statusCode: HttpStatus.OK,
+      data: result,
+    };
+  }
+
+  // ! for getting single blog
+  @Get('/:id')
+  async getSingleBlog(@Param('id') id: string) {
+    const result = await this.blogServices.getSingleBlog(id);
+
+    return {
+      success: true,
+      statusCode: HttpStatus.OK,
       data: result,
     };
   }

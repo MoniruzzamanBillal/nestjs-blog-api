@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { BlogModel } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -12,7 +10,6 @@ export class BlogService {
   // ! for creating a new blog
   async addNewBlog(payload: CreateBlogDto): Promise<BlogModel> {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const result: BlogModel = await this.prisma.blogModel.create({
         data: { ...payload },
       });
@@ -28,4 +25,22 @@ export class BlogService {
       throw new InternalServerErrorException('Failed to add blog');
     }
   }
+
+  // ! for getting all blogs
+  async getAllBlogs() {
+    const result = await this.prisma.blogModel.findMany();
+
+    return result;
+  }
+
+  // ! for getting single blog
+  async getSingleBlog(blogId: string) {
+    const result = await this.prisma.blogModel.findUniqueOrThrow({
+      where: { id: blogId },
+    });
+
+    return result;
+  }
+
+  //
 }
