@@ -1,6 +1,15 @@
-import { Body, Controller, Get, HttpStatus, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpStatus,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { BlogService } from './blog.service';
 import { CreateBlogDto } from './dto/create-blog.dto';
+import { UpdateBlogDto } from './dto/update-blog.dto';
 
 @Controller('blog')
 export class BlogController {
@@ -32,6 +41,21 @@ export class BlogController {
   @Get('/:id')
   async getSingleBlog(@Param('id') id: string) {
     const result = await this.blogServices.getSingleBlog(id);
+
+    return {
+      success: true,
+      statusCode: HttpStatus.OK,
+      data: result,
+    };
+  }
+
+  // ! for updating a blog
+  @Patch('/update-blog/:id')
+  async updateBlog(
+    @Param('id') id: string,
+    @Body() updateBlogDto: UpdateBlogDto,
+  ) {
+    const result = await this.blogServices.updateBlog(id, updateBlogDto);
 
     return {
       success: true,

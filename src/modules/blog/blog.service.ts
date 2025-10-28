@@ -1,7 +1,8 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { BlogModel } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateBlogDto } from './dto/create-blog.dto';
+import { UpdateBlogDto } from './dto/update-blog.dto';
 
 @Injectable()
 export class BlogService {
@@ -15,14 +16,8 @@ export class BlogService {
       });
 
       return result;
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.error('Database error:', error.message);
-      } else {
-        console.error('An unknown error occurred.');
-      }
-
-      throw new InternalServerErrorException('Failed to add blog');
+    } catch (error) {
+      throw new Error('Failed to add blog', error);
     }
   }
 
@@ -35,11 +30,31 @@ export class BlogService {
 
   // ! for getting single blog
   async getSingleBlog(blogId: string) {
-    const result = await this.prisma.blogModel.findUniqueOrThrow({
-      where: { id: blogId },
-    });
+    try {
+      const result = await this.prisma.blogModel.findUniqueOrThrow({
+        where: { id: blogId },
+      });
 
-    return result;
+      return result;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  // ! for updating blog
+  async updateBlog(blogId: string, payload: UpdateBlogDto) {
+    try {
+      await this.prisma.blogModel.findUniqueOrThrow({ where: { id: blogId } });
+
+      const result = await this.prisma.blogModel.update({
+        where: { id: blogId },
+        data: { ...payload },
+      });
+
+      return result;
+    } catch (error) {
+      throw new Error(error);
+    }
   }
 
   //
