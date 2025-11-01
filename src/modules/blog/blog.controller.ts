@@ -6,7 +6,10 @@ import {
   Param,
   Patch,
   Post,
+  Request,
+  UseGuards,
 } from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { BlogService } from './blog.service';
 import { CreateBlogDto } from './dto/create-blog.dto';
 import { UpdateBlogDto } from './dto/update-blog.dto';
@@ -15,8 +18,11 @@ import { UpdateBlogDto } from './dto/update-blog.dto';
 export class BlogController {
   constructor(private readonly blogServices: BlogService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Post('/add-blog')
-  async addNewBlog(@Body() addBlogDto: CreateBlogDto) {
+  async addNewBlog(@Body() addBlogDto: CreateBlogDto, @Request() req) {
+    console.log('user info = ', req?.user);
+
     const result = await this.blogServices.addNewBlog(addBlogDto);
 
     return {
@@ -27,7 +33,7 @@ export class BlogController {
   }
 
   @Get('/all-blogs')
-  async allBlogs() {
+  async allBlogs(@Request() req) {
     const result = await this.blogServices.getAllBlogs();
 
     return {
