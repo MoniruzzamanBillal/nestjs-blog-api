@@ -8,22 +8,34 @@ import { UpdateBlogDto } from './dto/update-blog.dto';
 export class BlogService {
   constructor(private prisma: PrismaService) {}
 
-  // ! for creating a new blog
-  async addNewBlog(payload: CreateBlogDto): Promise<BlogModel> {
+  // ! for creating a new
+  async addNewBlog(payload: CreateBlogDto, userId: string): Promise<BlogModel> {
+    console.log(payload);
+
     try {
       const result: BlogModel = await this.prisma.blogModel.create({
-        data: { ...payload },
+        data: { ...payload, authorId: userId },
       });
 
       return result;
     } catch (error) {
-      throw new Error('Failed to add blog', error);
+      throw new Error('Failed to create blog', error);
     }
   }
 
   // ! for getting all blogs
   async getAllBlogs() {
-    const result = await this.prisma.blogModel.findMany();
+    const result = await this.prisma.blogModel.findMany({
+      include: {
+        author: {
+          select: {
+            name: true,
+            email: true,
+            id: true,
+          },
+        },
+      },
+    });
 
     return result;
   }

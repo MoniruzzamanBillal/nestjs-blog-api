@@ -21,9 +21,10 @@ export class BlogController {
   @UseGuards(JwtAuthGuard)
   @Post('/add-blog')
   async addNewBlog(@Body() addBlogDto: CreateBlogDto, @Request() req) {
-    console.log('user info = ', req?.user);
-
-    const result = await this.blogServices.addNewBlog(addBlogDto);
+    const result = await this.blogServices.addNewBlog(
+      addBlogDto,
+      req?.user?.id,
+    );
 
     return {
       success: true,
@@ -33,7 +34,7 @@ export class BlogController {
   }
 
   @Get('/all-blogs')
-  async allBlogs(@Request() req) {
+  async allBlogs() {
     const result = await this.blogServices.getAllBlogs();
 
     return {
